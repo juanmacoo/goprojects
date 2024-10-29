@@ -16,11 +16,7 @@ var listCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		if allFlag {
-			initTasks.List()
-		} else {
-			initTasks.List()
-		}
+		initTasks.List(allFlag)
 	},
 }
 

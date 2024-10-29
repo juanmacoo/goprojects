@@ -27,30 +27,27 @@ func (t *Tasks) Add(description string) {
 	saveTasksToDisk(TasksFile, t)
 }
 
-func (t *Tasks) List() {
+func (t *Tasks) List(listAll bool) {
 	table := tabwriter.NewWriter(os.Stdout, 3, 5, 3, ' ', 0)
-	outputFormat := "%v\t%v\t%v"
+	defer table.Flush()
 
-	fmt.Fprintln(table, fmt.Sprintf(outputFormat, "ID", "Description", "Created At"))
-	for index, task := range *t {
-		if task.isCompleted {
-			verboseCreatedAt := helper.TimeDiffCalculator(task.createdAt)
-			fmt.Fprintln(table, fmt.Sprintf(outputFormat, index+1, task.description, verboseCreatedAt))
+	if listAll {
+		outputFormat := "%v\t%v\t%v"
+		fmt.Fprintln(table, fmt.Sprintf(outputFormat, "ID", "Description", "Created At"))
+		for index, task := range *t {
+			if task.isCompleted {
+				verboseCreatedAt := helper.TimeDiffCalculator(task.createdAt)
+				fmt.Fprintln(table, fmt.Sprintf(outputFormat, index+1, task.description, verboseCreatedAt))
+			}
 		}
-	}
-	table.Flush()
-}
-
-func (t *Tasks) ListAll() {
-	table := tabwriter.NewWriter(os.Stdout, 3, 5, 3, ' ', 0)
-	outputFormat := "%v\t%v\t%v\t%v"
-
-	fmt.Fprintln(table, fmt.Sprintf(outputFormat, "ID", "Description", "Created At", "Done"))
-	for index, task := range *t {
+	} else {
+		outputFormat := "%v\t%v\t%v\t%v"
+		fmt.Fprintln(table, fmt.Sprintf(outputFormat, "ID", "Description", "Created At", "Done"))
+		for index, task := range *t {
 			verboseCreatedAt := helper.TimeDiffCalculator(task.createdAt)
 			fmt.Fprintln(table, fmt.Sprintf(outputFormat, index+1, task.description, verboseCreatedAt, task.isCompleted))
+		}
 	}
-	table.Flush()
 }
 
 func (t *Tasks) Delete(id int){
