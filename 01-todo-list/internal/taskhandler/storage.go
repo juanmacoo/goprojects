@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -35,6 +36,8 @@ func ReadTasksFromDisk(filename string) (tasksFromDisk *Tasks) {
 	}
 	defer file.Close()
 
+	lockFile(file)
+
 	reader := csv.NewReader(file)
 	csvTasks, err := reader.ReadAll()
 	if err != nil {
@@ -59,6 +62,8 @@ func ReadTasksFromDisk(filename string) (tasksFromDisk *Tasks) {
 		}
 	}
 
+	unlockFile(file)
+
 	return
 }
 
@@ -69,6 +74,8 @@ func saveTasksToDisk(filename string, t *Tasks) {
 		os.Exit(1)
 	}
 	defer file.Close()
+
+	lockFile(file)
 
 	writer := csv.NewWriter(file)
 
@@ -84,4 +91,19 @@ func saveTasksToDisk(filename string, t *Tasks) {
 	}
 
 	writer.Flush()
+	unlockFile(file)
+}
+
+
+func lockFile(f *os.File){
+	if err := syscall.Flock(int(f.Fd()), syscall.LOCK_EX); err != nil {
+		_ = f.Close()
+		fmt.Println("Error when locking file")
+		os.Exit(1)
+	}
+}
+
+func unlockFile(f *os.File){
+	syscall.Flock(int(f.Fd()), syscall.LOCK_UN)
+	f.Close()
 }
