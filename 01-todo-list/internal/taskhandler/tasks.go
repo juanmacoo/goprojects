@@ -3,6 +3,7 @@ package taskhandler
 import (
 	"fmt"
 	"os"
+	"path"
 	"text/tabwriter"
 	"time"
 
@@ -24,7 +25,7 @@ func (t *Tasks) Add(description string) {
 		isCompleted: false,
 	})
 
-	saveTasksToDisk(TasksFile, t)
+	saveTasksToDisk(path.Join(TaskFileLocation, TasksFile), t)
 }
 
 func (t *Tasks) List(listAll bool) {
@@ -50,12 +51,12 @@ func (t *Tasks) List(listAll bool) {
 	}
 }
 
-func (t *Tasks) Delete(id int){
+func (t *Tasks) Delete(id int) {
 	*t = append((*t)[:id], (*t)[id+1:]...)
-	saveTasksToDisk(TasksFile, t)
+	saveTasksToDisk(path.Join(TaskFileLocation, TasksFile), t)
 }
 
 func (t *Tasks) Complete(id int) {
 	(*t)[id-1].isCompleted = true
-	saveTasksToDisk(TasksFile, t)
+	saveTasksToDisk(path.Join(TaskFileLocation, TasksFile), t)
 }

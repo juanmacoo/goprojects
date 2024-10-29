@@ -34,9 +34,8 @@ func ReadTasksFromDisk(filename string) (tasksFromDisk *Tasks) {
 		fmt.Println("Error opening:", err)
 		os.Exit(1)
 	}
-	defer file.Close()
-
 	lockFile(file)
+	defer unlockFile(file)
 
 	reader := csv.NewReader(file)
 	csvTasks, err := reader.ReadAll()
@@ -62,8 +61,6 @@ func ReadTasksFromDisk(filename string) (tasksFromDisk *Tasks) {
 		}
 	}
 
-	unlockFile(file)
-
 	return
 }
 
@@ -73,11 +70,11 @@ func saveTasksToDisk(filename string, t *Tasks) {
 		fmt.Println("Error creating:", err)
 		os.Exit(1)
 	}
-	defer file.Close()
-
 	lockFile(file)
+	defer unlockFile(file)
 
 	writer := csv.NewWriter(file)
+	defer writer.Flush()
 
 	if err := writer.Write([]string{"id", "description", "createdAt", "isCompleted"}); err != nil {
 		fmt.Println("Error writing:", err)
@@ -89,9 +86,6 @@ func saveTasksToDisk(filename string, t *Tasks) {
 			os.Exit(1)
 		}
 	}
-
-	writer.Flush()
-	unlockFile(file)
 }
 
 
