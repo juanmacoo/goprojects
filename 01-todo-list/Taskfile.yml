@@ -1,0 +1,12 @@
+# https://taskfile.dev
+---
+version: '3'
+
+includes:
+  go: ../GeneralGo.yml
+
+tasks:
+  run-list:
+    desc: "Run tasks list"
+    cmds:
+      - "go run main.go list"
